@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MIA – Tu Organizadora Personal Virtual</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #fdf6f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    header {
+      width: 100%;
+      background: #fff;
+      border-bottom: 1px solid #f0e8e0;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 42px;
+      height: 42px;
+      background: #c9856a;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .header-info h1 {
+      font-size: 17px;
+      color: #3d2b1f;
+      font-weight: 600;
+    }
+
+    .header-info p {
+      font-size: 13px;
+      color: #9b7b6e;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 700px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      padding: 0 16px;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 0 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: calc(100vh - 180px);
+      max-height: calc(100vh - 180px);
+    }
+
+    .message {
+      display: flex;
+      gap: 10px;
+      max-width: 85%;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .message.assistant {
+      align-self: flex-start;
+    }
+
+    .bubble {
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 15px;
+      line-height: 1.55;
+      color: #3d2b1f;
+    }
+
+    .message.user .bubble {
+      background: #c9856a;
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .message.assistant .bubble {
+      background: #fff;
+      border: 1px solid #f0e8e0;
+      border-bottom-left-radius: 4px;
+    }
+
+    .msg-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #c9856a;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+      flex-shrink: 0;
+      align-self: flex-end;
+    }
+
+    .message.user .msg-avatar {
+      background: #e0cdc7;
+      color: #7a4f3a;
+    }
+
+    .typing {
+      display: flex;
+      gap: 5px;
+      padding: 14px 16px;
+      background: #fff;
+      border: 1px solid #f0e8e0;
+      border-radius: 18px;
+      border-bottom-left-radius: 4px;
+      width: fit-content;
+    }
+
+    .typing span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #c9856a;
+      animation: bounce 1.2s infinite;
+    }
+
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-6px); }
+    }
+
+    .input-area {
+      padding: 16px 0 24px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    textarea {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1.5px solid #e8d8d0;
+      border-radius: 24px;
+      font-size: 15px;
+      font-family: inherit;
+      color: #3d2b1f;
+      background: #fff;
+      resize: none;
+      outline: none;
+      transition: border-color 0.2s;
+      line-height: 1.5;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+
+    textarea:focus {
+      border-color: #c9856a;
+    }
+
+    textarea::placeholder {
+      color: #c4a89b;
+    }
+
+    button#send {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: #c9856a;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.1s;
+      flex-shrink: 0;
+    }
+
+    button#send:hover { background: #b87460; }
+    button#send:active { transform: scale(0.95); }
+    button#send:disabled { background: #e0cdc7; cursor: not-allowed; }
+
+    button#send svg {
+      width: 20px;
+      height: 20px;
+      fill: white;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="avatar">M</div>
+  <div class="header-info">
+    <h1>MIA</h1>
+    <p>Tu Organizadora Personal Virtual</p>
+  </div>
+</header>
+
+<div class="chat-container">
+  <div class="messages" id="messages"></div>
+
+  <div class="input-area">
+    <textarea
+      id="input"
+      rows="1"
+      placeholder="Escribe tu mensaje..."
+      onkeydown="handleKey(event)"
+      oninput="autoResize(this)"
+    ></textarea>
+    <button id="send" onclick="sendMessage()">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  const messagesEl = document.getElementById("messages");
+  const inputEl = document.getElementById("input");
+  const sendBtn = document.getElementById("send");
+
+  let history = [];
+
+  function autoResize(el) {
+    el.style.height = "auto";
+    el.style.height = Math.min(el.scrollHeight, 120) + "px";
+  }
+
+  function handleKey(e) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }
+
+  function addMessage(role, content) {
+    const wrapper = document.createElement("div");
+    wrapper.className = `message ${role}`;
+
+    const avatarEl = document.createElement("div");
+    avatarEl.className = "msg-avatar";
+    avatarEl.textContent = role === "assistant" ? "M" : "U";
+
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    bubble.textContent = content;
+
+    wrapper.appendChild(avatarEl);
+    wrapper.appendChild(bubble);
+    messagesEl.appendChild(wrapper);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function showTyping() {
+    const wrapper = document.createElement("div");
+    wrapper.className = "message assistant";
+    wrapper.id = "typing-indicator";
+
+    const avatarEl = document.createElement("div");
+    avatarEl.className = "msg-avatar";
+    avatarEl.textContent = "M";
+
+    const typing = document.createElement("div");
+    typing.className = "typing";
+    typing.innerHTML = "<span></span><span></span><span></span>";
+
+    wrapper.appendChild(avatarEl);
+    wrapper.appendChild(typing);
+    messagesEl.appendChild(wrapper);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function removeTyping() {
+    const el = document.getElementById("typing-indicator");
+    if (el) el.remove();
+  }
+
+  async function sendMessage() {
+    const text = inputEl.value.trim();
+    if (!text) return;
+
+    inputEl.value = "";
+    inputEl.style.height = "auto";
+    sendBtn.disabled = true;
+
+    addMessage("user", text);
+    history.push({ role: "user", content: text });
+
+    showTyping();
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: history }),
+      });
+
+      const data = await res.json();
+      removeTyping();
+
+      if (data.reply) {
+        addMessage("assistant", data.reply);
+        history.push({ role: "assistant", content: data.reply });
+      } else {
+        addMessage("assistant", "Hubo un error. Por favor, intenta de nuevo.");
+      }
+    } catch (err) {
+      removeTyping();
+      addMessage("assistant", "No pude conectarme. Por favor, intenta de nuevo.");
+    }
+
+    sendBtn.disabled = false;
+    inputEl.focus();
+  }
+
+  // Mensaje de bienvenida
+  window.onload = () => {
+    addMessage("assistant", "¡Hola! Soy MIA, tu organizadora personal virtual. 😊\n\n¿Cómo te gustaría que te llame? ¿Y cómo va tu proceso de organización en casa?");
+  };
+</script>
+
+</body>
+</html>
